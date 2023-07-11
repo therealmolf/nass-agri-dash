@@ -15,15 +15,9 @@ while getopts ":f:d:" option; do
   esac
 done
 
+
 PROJECT="artemis-1-391005"
 DATASET="agri"
-
-# Create the Table if it does not already exist in the BigQuery Dataset
-echo "-----------------------------------------------------------"
-echo "Creating Table " $destination_table " in " $DATASET
-echo "-----------------------------------------------------------"
-
-bq mk --table $DATASET.$destination_table
 
 
 # Query USDA NASS Agri Dataset and Save Result to a Table
