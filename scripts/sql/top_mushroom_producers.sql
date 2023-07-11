@@ -1,28 +1,24 @@
--- Top Corn Producers (BU) per State in 2018
+-- Top Mushroom Producers (LB) per State in 2022
 
-WITH 
+WITH
   temp_table AS
   (SELECT
     state_name,
     commodity_desc,
-    SUM(value) AS total_produce,
+    SUM(value) as total_produce,
     TIMESTAMP_TRUNC(load_time, YEAR) AS year_load,
   FROM 
     `bigquery-public-data.usda_nass_agriculture.crops`
   WHERE
-    group_desc='FIELD CROPS' AND
+    group_desc='HORTICULTURE' AND
     statisticcat_desc='PRODUCTION' AND
     agg_level_desc='STATE' AND
-    value IS NOT NULL AND
-    unit_desc='BU'
+    commodity_desc='MUSHROOMS' AND
+    value IS NOT NULL
   GROUP BY
-    commodity_desc,
-    year_load,
-    state_name
-  ORDER BY
     state_name,
     commodity_desc,
-    total_produce DESC)
+    year_load)
 SELECT
   state_name,
   commodity_desc,
@@ -30,10 +26,10 @@ SELECT
 FROM
   temp_table
 WHERE
-  year_load='2018-01-01 00:00:00 UTC' AND
-  commodity_desc='CORN'
+  year_load='2022-01-01 00:00:00 UTC'
 GROUP BY
   state_name,
   commodity_desc
 ORDER BY
-  state_name
+  total_prod DESC
+  
