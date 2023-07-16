@@ -25,10 +25,10 @@ def geocode_with_sleep(row) -> pd.Series:
     """
 
     # Instantiate Nominatim Geolocator
-    geolocator = Nominatim(user_agent='miksbon@gmail.com')
+    geolocator = Nominatim(user_agent='http')
 
     query = row['state_name']
-    sleep(1)
+    sleep(2)
     location = geolocator.geocode(query)
 
     return pd.Series(
