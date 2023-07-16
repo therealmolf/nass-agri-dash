@@ -9,13 +9,7 @@ from geopy.geocoders import Nominatim
 # Util
 from tqdm import tqdm
 from time import sleep
-
-
-# Initialize progress bar integration with Pandas
-tqdm.pandas()
-
-# Instantiate Nominatim Geolocator
-geolocator = Nominatim(user_agent='http')
+import argparse
 
 
 def geocode_with_sleep(row) -> pd.Series:
@@ -29,6 +23,9 @@ def geocode_with_sleep(row) -> pd.Series:
     Returns:
         (pd.Series) The longitude and latitude from the state_name
     """
+
+    # Instantiate Nominatim Geolocator
+    geolocator = Nominatim(user_agent='miksbon@gmail.com')
 
     query = row['state_name']
     sleep(1)
@@ -122,17 +119,26 @@ def csv_to_geodataframe(csv) -> gpd.GeoDataFrame:
     return geo_df
 
 
-def save_geodataframe():
-    pass
+def main(csv: str, shp: str) -> None:
+    # Initialize progress bar integration with Pandas
+    tqdm.pandas()
 
+    # pass csv name
+    geo_df = csv_to_geodataframe(csv)
+    # pass shp name
+    geo_df.to_file(shp)
 
-def main():
-    pass
-    # tqdm
-    # nominatim
-    # csv to geodf
-    # geodf to saved file
+    print("Shp file has been created.")
 
 
 if __name__ == '__main__':
-    main()
+
+    parser = argparse.ArgumentParser(
+        description="Convert Address CSV into GeoDataFrame")
+
+    parser.add_argument("-c", "--csv", help="CSV File Name")
+    parser.add_argument("-s", "--shp", help="SHP File Name")
+
+    args = parser.parse_args()
+
+    main(args.csv, args.shp)
