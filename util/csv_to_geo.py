@@ -12,7 +12,7 @@ from time import sleep
 import argparse
 
 
-def geocode_with_sleep(row) -> pd.Series:
+def geocode_with_sleep(row, geolocator) -> pd.Series:
     """
     Get coordinates from a row's state_name.
     Limited geocoding to follow Nominatim Usage Limits.
@@ -24,9 +24,6 @@ def geocode_with_sleep(row) -> pd.Series:
         (pd.Series) The longitude and latitude from the state_name
     """
 
-    # Instantiate Nominatim Geolocator
-    geolocator = Nominatim(user_agent='http')
-
     query = row['state_name']
     sleep(2)
     location = geolocator.geocode(query)
@@ -36,7 +33,7 @@ def geocode_with_sleep(row) -> pd.Series:
         index=['longitude', 'latitude'])
 
 
-def get_coordinates(df: pd.DataFrame) -> pd.DataFrame:
+def get_coordinates(df: pd.DataFrame, geo) -> pd.DataFrame:
     """
         A function that applies a geocoder to the input DataFrame to get
         the coordinates for each.
@@ -52,7 +49,7 @@ def get_coordinates(df: pd.DataFrame) -> pd.DataFrame:
     # No side effects to input df
     df = df.copy()
     df[['longitude', 'latitude']] = df.progress_apply(
-        geocode_with_sleep,
+        lambda x: geocode_with_sleep(x, geo),
         axis=1,
         result_type='expand')
 
@@ -111,8 +108,11 @@ def csv_to_geodataframe(csv) -> gpd.GeoDataFrame:
             (gpd.GeoDataFrame) A new GeoDataFrame based on the CSV passed.
     """
 
+    # Instantiate Nominatim Geolocator
+    geolocator = Nominatim(user_agent='http')
+
     df = pd.read_csv(csv)
-    coord_df = get_coordinates(df)
+    coord_df = get_coordinates(df, geolocator)
     points = get_points(coord_df)
     geo_df = to_geodataframe(coord_df, points)
 
